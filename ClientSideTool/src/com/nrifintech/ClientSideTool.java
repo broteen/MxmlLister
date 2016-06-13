@@ -1,10 +1,13 @@
 package com.nrifintech;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -17,11 +20,19 @@ public class ClientSideTool {
 
 	public static void main(String[] args) {
 		 try {
-
-				File fXmlFile = new File("D:/NAM_Project/NAM-Trunk/trunk/devel/client/rui-apps/main/src/trd/src/TradeEntryModule.mxml");
+                
+			 File dir = new File("/home/broteen/ClientSideTool/src");
+			  File[] directoryListing = dir.listFiles();
+			  FileWriter fw=new FileWriter("ListOfEnabledMxmls.txt");
+			  BufferedWriter bw = new BufferedWriter(fw);
+			  if (directoryListing != null) {
+			    for (File child : directoryListing)
+			    {
+			    	if(child.getName().contains(".mxml"))
+			    	{
 				DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 				DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-				Document doc = dBuilder.parse(fXmlFile);
+				Document doc = dBuilder.parse(child);
 				NodeList nListScript= doc.getElementsByTagName("mx:Script");
 				   Node nNodeScript = nListScript.item(1);
 				   Element eElementScript = (Element) nNodeScript;
@@ -58,12 +69,18 @@ public class ClientSideTool {
 						   funcName=eElement.getAttribute("click").replace(";", "");
 						   System.out.println(funcName);
 						   
-						   if(SearchInActionScript(eElement.getAttribute("id"),funcName,eElementScript.getAttribute("source"))){
-							   System.out.println("We are here ");
+						   if(!(SearchInActionScript(eElement.getAttribute("id"),funcName,eElementScript.getAttribute("source")))){
+					          System.out.println(child.getCanonicalPath());
+							   bw.write(child.getCanonicalPath() + " "+ eElement.getAttribute("id") + "\n");
+							   
 						   }
 					   }
 				}
 				}
+			    }
+			  }
+			  }
+			  bw.close();
 			    } catch (Exception e) {
 				e.printStackTrace();
 			    }
@@ -75,7 +92,7 @@ public class ClientSideTool {
 		String line="";
 		boolean enabledFlag=true;
 		try{
-		br = new BufferedReader(new FileReader("D:/NAM_Project/NAM-Trunk/trunk/devel/client/rui-apps/main/src/trd/src/" +fileName));
+		br = new BufferedReader(new FileReader("/home/broteen/ClientSideTool/src/" +fileName));
 		while((line = br.readLine()) != null){
 			if(line.contains(functionName)){
 				System.out.println(line);
@@ -86,6 +103,7 @@ public class ClientSideTool {
 					//System.out.println(line);
 					if(line.contains(id + ".enabled")){
 						System.out.println("Found It.");
+						enabledFlag=false;
 						 break;
 					}
 					else if((line=br.readLine()).contains("function")){
