@@ -1,3 +1,10 @@
+/home/broteen/ClientSideTool/src/ref/TradeEntryModule.mxml uConfSubmit
+/home/broteen/ClientSideTool/src/ref/TradeEntryModule.mxml cancelSubmit
+/home/broteen/ClientSideTool/src/ref/TradeEntryModule.mxml sConfSubmit
+/home/broteen/ClientSideTool/src/ref/TradeEntryModule.mxml uCancelConfSubmit
+/home/broteen/ClientSideTool/src/ref/TradeEntryModule.mxml sConfCxlOk
 /home/broteen/ClientSideTool/src/TradeEntryModule.mxml uConfSubmit
 /home/broteen/ClientSideTool/src/TradeEntryModule.mxml cancelSubmit
+/home/broteen/ClientSideTool/src/TradeEntryModule.mxml sConfSubmit
 /home/broteen/ClientSideTool/src/TradeEntryModule.mxml uCancelConfSubmit
+/home/broteen/ClientSideTool/src/TradeEntryModule.mxml sConfCxlOk

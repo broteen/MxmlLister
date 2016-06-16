@@ -19,71 +19,29 @@ import org.w3c.dom.NodeList;
 public class ClientSideTool {
 
 	public static void main(String[] args) {
-		 try {
-                
+         try{       
+		FileWriter fw=new FileWriter("ListOfEnabledMxmls.txt");
+		BufferedWriter bw = new BufferedWriter(fw);
 			 File dir = new File("/home/broteen/ClientSideTool/src");
-			  File[] directoryListing = dir.listFiles();
-			  FileWriter fw=new FileWriter("ListOfEnabledMxmls.txt");
-			  BufferedWriter bw = new BufferedWriter(fw);
-			  if (directoryListing != null) {
-			    for (File child : directoryListing)
-			    {
-			    	if(child.getName().contains(".mxml"))
-			    	{
-				DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-				DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-				Document doc = dBuilder.parse(child);
-				NodeList nListScript= doc.getElementsByTagName("mx:Script");
-				   Node nNodeScript = nListScript.item(1);
-				   Element eElementScript = (Element) nNodeScript;
-				   String funcName=null;
+			 if(dir.isDirectory())
+			 {
+				 searchInDirectory(dir,bw);
+			 }
+			 else if(dir.isFile())
+			 {
+				 searchInFile(dir,bw);
+			 }
+			 bw.close();
+         }catch(Exception e)
+         {
+        	 e.printStackTrace();
+         }
+			 
 						
-				//optional, but recommended
-				//read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
-				doc.getDocumentElement().normalize();
 
-				System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
 						
-				NodeList nList = doc.getElementsByTagName("cntrls:XenosButton");
 						
-				System.out.println("----------------------------");
 
-				for (int temp = 0; temp < nList.getLength(); temp++) {
-
-					Node nNode = nList.item(temp);
-							
-					System.out.println("\nCurrent Element :" + nNode.getNodeName());
-					System.out.println(eElementScript.getAttribute("source"));
-					
-					
-					if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-
-						Element eElement = (Element) nNode;
-
-						System.out.println("XenosButton: " + eElement.getAttribute("click"));
-						System.out.println(eElement.getAttribute("id"));
-					   if(eElement.getAttribute("click").contains("()"))
-					   {
-						   
-						   System.out.println(eElementScript.getAttribute("source"));
-						   funcName=eElement.getAttribute("click").replace(";", "");
-						   System.out.println(funcName);
-						   
-						   if(!(SearchInActionScript(eElement.getAttribute("id"),funcName,eElementScript.getAttribute("source")))){
-					          System.out.println(child.getCanonicalPath());
-							   bw.write(child.getCanonicalPath() + " "+ eElement.getAttribute("id") + "\n");
-							   
-						   }
-					   }
-				}
-				}
-			    }
-			  }
-			  }
-			  bw.close();
-			    } catch (Exception e) {
-				e.printStackTrace();
-			    }
 	}
 	
 	public static boolean SearchInActionScript(String id, String functionName,String fileName)
@@ -103,6 +61,7 @@ public class ClientSideTool {
 					//System.out.println(line);
 					if(line.contains(id + ".enabled")){
 						System.out.println("Found It.");
+						System.out.println(line);
 						enabledFlag=false;
 						 break;
 					}
@@ -118,4 +77,90 @@ public class ClientSideTool {
     }
 		return enabledFlag;
 	}
+	
+	public static void searchInDirectory(File file, BufferedWriter bw)
+	{
+		File[] directoryListing = file.listFiles();
+		if(file.listFiles()!=null)
+		{
+		for(File child: directoryListing)
+		{
+			if(child.isDirectory())
+			{
+				searchInDirectory(child,bw);
+			}
+			else if(child.isFile() && child.getName().endsWith(".mxml"))
+			{
+				searchInFile(child,bw);
+			}
+		}
+		}
+	}
+	public static void searchInFile(File file,BufferedWriter bw)
+	{
+        
+		try{
+			
+		
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+		Document doc = dBuilder.parse(file);
+		NodeList nListScript= doc.getElementsByTagName("mx:Script");
+		Node nNodeScript = nListScript.item(1);
+		Element eElementScript = (Element) nNodeScript;
+		String funcName=null;
+				
+		//optional, but recommended
+		//read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
+		doc.getDocumentElement().normalize();
+
+		System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
+				
+		NodeList nList = doc.getElementsByTagName("cntrls:XenosButton");
+				
+		System.out.println("----------------------------");
+
+		for (int temp = 0; temp < nList.getLength(); temp++) {
+
+			Node nNode = nList.item(temp);
+					
+			System.out.println("\nCurrent Element :" + nNode.getNodeName());
+			System.out.println(eElementScript.getAttribute("source"));
+			
+			
+			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+
+				Element eElement = (Element) nNode;
+
+				System.out.println("XenosButton: " + eElement.getAttribute("click"));
+				System.out.println(eElement.getAttribute("id"));
+			   if(eElement.getAttribute("click").contains("()"))
+			   {
+				   
+				   System.out.println(eElementScript.getAttribute("source"));
+				   funcName=eElement.getAttribute("click").replace(";", "");
+				   System.out.println(funcName);
+				   
+				   
+				   if(!(SearchInActionScript(eElement.getAttribute("id"),funcName,eElementScript.getAttribute("source")))){
+			          
+			        	  System.out.println(file.getCanonicalPath());
+			        	  bw.write(file.getCanonicalPath() + " "+ eElement.getAttribute("id") + "\n");
+					   }			          
+					   
+					   
+				   
+			   }
+			   else {
+				   System.out.println("Hey");
+				   bw.write(file.getCanonicalPath() + " "+ eElement.getAttribute("id") + "\n");
+			   }
+		}
+		}
+	 
+	}catch (Exception e) {
+		e.printStackTrace();
+    }
+	}
+
 }
