@@ -22,7 +22,7 @@ public class ClientSideTool {
          try{       
 		FileWriter fw=new FileWriter("ListOfEnabledMxmls.txt");
 		BufferedWriter bw = new BufferedWriter(fw);
-			 File dir = new File("/home/broteen/ClientSideTool/src");
+			 File dir = new File("D:/NAM_Project/NAM-Trunk/trunk/devel/client/rui-apps/main/src");
 			 if(dir.isDirectory())
 			 {
 				 searchInDirectory(dir,bw);
@@ -50,7 +50,7 @@ public class ClientSideTool {
 		String line="";
 		boolean enabledFlag=true;
 		try{
-		br = new BufferedReader(new FileReader("/home/broteen/ClientSideTool/src/" +fileName));
+		br = new BufferedReader(new FileReader("D:/NAM_Project/NAM-Trunk/trunk/devel/client/rui-apps/main/src" +fileName));
 		while((line = br.readLine()) != null){
 			if(line.contains(functionName)){
 				System.out.println(line);
